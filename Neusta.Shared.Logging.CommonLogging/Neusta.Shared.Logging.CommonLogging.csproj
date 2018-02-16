@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.4</TargetFramework>
+    <AssemblyOriginatorKeyFile>..\Neusta.Shared.snk</AssemblyOriginatorKeyFile>
+    <CodeAnalysisRuleSet>..\Neusta.Shared.ruleset</CodeAnalysisRuleSet>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\Neusta.Shared.snk" Link="Neusta.Shared.snk" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Common.Logging" Version="3.4.1" />
+    <PackageReference Include="JetBrains.Annotations" Version="2019.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Neusta.Shared.Core\Neusta.Shared.Core.csproj" />
+    <ProjectReference Include="..\Neusta.Shared.Logging\Neusta.Shared.Logging.csproj" />
+  </ItemGroup>
+
+</Project>

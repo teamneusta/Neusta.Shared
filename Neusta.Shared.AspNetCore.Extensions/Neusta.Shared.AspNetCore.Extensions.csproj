@@ -1,0 +1,51 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\Neusta.Shared.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="ContainerService\**" />
+    <Compile Remove="DataAccess\**" />
+    <EmbeddedResource Remove="ContainerService\**" />
+    <EmbeddedResource Remove="DataAccess\**" />
+    <None Remove="ContainerService\**" />
+    <None Remove="DataAccess\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Extensions\IServiceCollectionExtensions.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="ContainerService\ServiceProvider.cs" />
+    <Compile Include="ContainerService\Extensions\IServiceCollectionExtensions.cs" />
+    <Compile Include="ContainerService\Extensions\IWebHostBuilderExtensions.cs" />
+    <Compile Include="ContainerService\ServiceProviderFactory.cs" />
+    <Compile Include="ContainerService\TranslatedServiceDescriptor.cs" />
+    <Compile Include="ContainerService\ServiceScopeFactory.cs" />
+    <Compile Include="ContainerService\ServiceScope.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\Neusta.Shared.snk" Link="Neusta.Shared.snk" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.2" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Configuration" Version="2.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Neusta.Shared.Core\Neusta.Shared.Core.csproj" />
+    <ProjectReference Include="..\Neusta.Shared.DataAccess\Neusta.Shared.DataAccess.csproj" />
+    <ProjectReference Include="..\Neusta.Shared.Logging\Neusta.Shared.Logging.csproj" />
+    <ProjectReference Include="..\Neusta.Shared.ObjectProvider.NetStandard\Neusta.Shared.ObjectProvider.NetStandard.csproj" />
+    <ProjectReference Include="..\Neusta.Shared.ObjectProvider\Neusta.Shared.ObjectProvider.csproj" />
+    <ProjectReference Include="..\Neusta.Shared.Services\Neusta.Shared.Services.csproj" />
+  </ItemGroup>
+
+</Project>

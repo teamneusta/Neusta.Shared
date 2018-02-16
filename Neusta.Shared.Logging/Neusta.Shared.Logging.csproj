@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.4</TargetFramework>
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>false</DelaySign>
+    <AssemblyOriginatorKeyFile>..\Neusta.Shared.snk</AssemblyOriginatorKeyFile>
+    <CodeAnalysisRuleSet>..\Neusta.Shared.ruleset</CodeAnalysisRuleSet>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Company>team neusta GmbH</Company>
+    <Product>Neusta.Shared</Product>
+    <Authors>opensource@neusta.de</Authors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\Neusta.Shared.snk" Link="Neusta.Shared.snk" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="JetBrains.Annotations" Version="2019.1.1" />
+  </ItemGroup>
+
+</Project>

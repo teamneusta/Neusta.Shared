@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\Neusta.Shared.snk</AssemblyOriginatorKeyFile>
+    <CodeAnalysisRuleSet>..\Neusta.Shared.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\Neusta.Shared.snk" Link="Neusta.Shared.snk" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Neusta.Shared.Core\Neusta.Shared.Core.csproj" />
+    <ProjectReference Include="..\Neusta.Shared.DataAccess\Neusta.Shared.DataAccess.csproj" />
+    <ProjectReference Include="..\Neusta.Shared.ObjectProvider\Neusta.Shared.ObjectProvider.csproj" />
+  </ItemGroup>
+
+</Project>

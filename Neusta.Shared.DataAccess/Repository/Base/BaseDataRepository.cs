@@ -26,7 +26,7 @@
 		/// Gets the data context.
 		/// </summary>
 		[PublicAPI]
-		public IDataContext DataContext
+		public virtual IDataContext DataContext
 		{
 			[DebuggerStepThrough]
 			get { return this.dataContext; }
@@ -80,7 +80,7 @@
 		IDataContext IDataContextOwner.DataContext
 		{
 			[DebuggerStepThrough]
-			get { return this.dataContext; }
+			get { return this.DataContext; }
 		}
 
 		/// <summary>
@@ -92,7 +92,7 @@
 		IDataContextExtensions IDataContextOwner.Extensions
 		{
 			[DebuggerStepThrough]
-			get { return this.dataContext.Extensions; }
+			get { return this.DataContext.Extensions; }
 		}
 
 		#endregion

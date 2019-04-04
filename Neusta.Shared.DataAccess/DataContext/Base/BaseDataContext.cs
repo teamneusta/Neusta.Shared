@@ -294,7 +294,7 @@
 		/// </summary>
 		public virtual Task SaveChangesAsync()
 		{
-			return Task.Run(() => this.SaveChanges());
+			return Task.Run(this.SaveChanges);
 		}
 
 		/// <summary>

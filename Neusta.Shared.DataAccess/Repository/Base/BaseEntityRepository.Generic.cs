@@ -23,7 +23,7 @@
 		/// <summary>
 		/// Gets the <see cref="IDataContext" />.
 		/// </summary>
-		public new TDataContext DataContext
+		public new virtual TDataContext DataContext
 		{
 			[DebuggerStepThrough]
 			get { return (TDataContext)base.DataContext; }

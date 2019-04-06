@@ -1,8 +1,9 @@
 ﻿namespace Neusta.Shared.DataAccess.UnitOfWork
 {
 	using System;
-	using System.Transactions;
 	using JetBrains.Annotations;
+	using Neusta.Shared.DataAccess.UnitOfWork.Base;
+	using Neusta.Shared.DataAccess.UnitOfWork.Utils;
 
 	public sealed class UnitOfWork : BaseUnitOfWork
 	{
@@ -23,15 +24,21 @@
 		{
 		}
 
-		public TransactionScope BeginTransactionScope()
+		/// <summary>
+		/// Gets the current <see cref="IUnitOfWork" />.
+		/// </summary>
+		[PublicAPI]
+		public static IUnitOfWork Current
 		{
-			var options = new TransactionOptions()
+			get
 			{
-				IsolationLevel = IsolationLevel.RepeatableRead,
-				Timeout = TimeSpan.FromMinutes(1)
-			};
-			var scope = new TransactionScope(TransactionScopeOption.Required, options, TransactionScopeAsyncFlowOption.Enabled);
-			return scope;
+				ContextData threadContextData;
+				if (CallContextCurrentData.TryGetCurrentData(out threadContextData))
+				{
+					return threadContextData.CurrentUnitOfWork;
+				}
+				return null;
+			}
 		}
 
 		#region Overrides of BaseUnitOfWork

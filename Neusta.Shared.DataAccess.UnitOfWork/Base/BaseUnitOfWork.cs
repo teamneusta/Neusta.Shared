@@ -1,4 +1,4 @@
-﻿namespace Neusta.Shared.DataAccess.UnitOfWork
+﻿namespace Neusta.Shared.DataAccess.UnitOfWork.Base
 {
 	using System;
 	using System.Collections.Generic;
@@ -11,6 +11,7 @@
 	using Neusta.Shared.Core.DisposableObjects;
 	using Neusta.Shared.DataAccess.Repository;
 	using Neusta.Shared.DataAccess.UnitOfWork.Factory;
+	using Neusta.Shared.DataAccess.UnitOfWork.Utils;
 	using Neusta.Shared.ObjectProvider;
 
 	public abstract class BaseUnitOfWork : DisposableObject, IUnitOfWork
@@ -28,6 +29,10 @@
 		private IUnitOfWorkServiceFactory factory;
 		private IObjectProvider objectProvider;
 
+		private readonly ContextKey contextKey = new ContextKey();
+		private BaseUnitOfWork savedCurrentUnitOfWork;
+		private ContextData threadContextData;
+
 		/// <summary>
 		/// Initializes a new instance of the <see cref="BaseUnitOfWork"/> class.
 		/// </summary>
@@ -35,6 +40,8 @@
 		{
 			this.uniqueID = Interlocked.Increment(ref uniqueIDCounter);
 			this.factory = SimpleUnitOfWorkServiceFactory.Instance;
+
+
 		}
 
 		/// <summary>
@@ -758,6 +765,38 @@
 		public override string ToString()
 		{
 			return $"{this.GetType().Name}[#{this.uniqueID}]";
+		}
+
+		#endregion
+
+		#region Private Methods
+
+		private void PushScope()
+		{
+			// Get current CallContext data
+			this.threadContextData = CallContextCurrentData.CreateOrGetCurrentData(this.contextKey);
+
+			// Save the previous scope and save our scope
+			this.savedCurrentUnitOfWork = this.threadContextData.CurrentUnitOfWork;
+			this.threadContextData.CurrentUnitOfWork = this;
+		}
+
+		private void PopScope()
+		{
+			// Clear the current scope in CallContext data
+			CallContextCurrentData.ClearCurrentData(this.contextKey, true);
+
+			// Restore threadContextData to parent CallContext or TLS data
+			if (this.savedCurrentUnitOfWork != null)
+			{
+				this.threadContextData = CallContextCurrentData.CreateOrGetCurrentData(this.savedCurrentUnitOfWork.contextKey);
+				this.threadContextData.CurrentUnitOfWork = this.savedCurrentUnitOfWork;
+			}
+			else
+			{
+				// Clear any CallContext data
+				CallContextCurrentData.ClearCurrentData(null, false);
+			}
 		}
 
 		#endregion

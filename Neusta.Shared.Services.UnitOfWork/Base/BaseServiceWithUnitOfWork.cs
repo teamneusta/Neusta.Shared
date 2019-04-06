@@ -3,6 +3,7 @@ namespace Neusta.Shared.Services.UnitOfWork
 	using System;
 	using System.Diagnostics;
 	using System.Linq;
+	using System.Threading;
 	using JetBrains.Annotations;
 	using Neusta.Shared.DataAccess;
 	using Neusta.Shared.ObjectProvider;
@@ -34,25 +35,36 @@ namespace Neusta.Shared.Services.UnitOfWork
 
 		public TChildService GetChildService<TChildService>(object[] dependencyOverrides = null)
 		{
-			IUnitOfWork unitOfWorkClone = this.UnitOfWork.Clone();
 			IObjectProvider objectProvider = this.UnitOfWork.ObjectProvider;
-			if (objectProvider != null)
+			if (typeof(IUnitOfWorkOwner).IsAssignableFrom(typeof(TChildService)))
 			{
-				if ((dependencyOverrides != null) && dependencyOverrides.Any())
+				IUnitOfWork unitOfWorkClone = this.UnitOfWork.Clone();
+				if (objectProvider != null)
 				{
-					int length = dependencyOverrides.Length;
-					Array.Resize(ref dependencyOverrides, length + 1);
-					dependencyOverrides[length] = unitOfWorkClone;
+					if ((dependencyOverrides != null) && dependencyOverrides.Any())
+					{
+						int length = dependencyOverrides.Length;
+						Array.Resize(ref dependencyOverrides, length + 1);
+						dependencyOverrides[length] = unitOfWorkClone;
+					}
+					else
+					{
+						dependencyOverrides = new object[] { unitOfWorkClone };
+					}
+					return objectProvider.GetInstance<TChildService>(dependencyOverrides);
 				}
 				else
 				{
-					dependencyOverrides = new object[] { unitOfWorkClone };
+					return (TChildService)Activator.CreateInstance(typeof(TChildService), unitOfWorkClone);
 				}
+			}
+			else if (objectProvider != null)
+			{
 				return objectProvider.GetInstance<TChildService>(dependencyOverrides);
 			}
 			else
 			{
-				return (TChildService)Activator.CreateInstance(typeof(TChildService), unitOfWorkClone);
+				return (TChildService)Activator.CreateInstance(typeof(TChildService));
 			}
 		}
 	}

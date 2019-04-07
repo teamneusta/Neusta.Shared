@@ -3,7 +3,6 @@ namespace Neusta.Shared.Services.UnitOfWork
 	using System;
 	using System.Diagnostics;
 	using System.Linq;
-	using System.Threading;
 	using JetBrains.Annotations;
 	using Neusta.Shared.DataAccess;
 	using Neusta.Shared.ObjectProvider;
@@ -16,7 +15,7 @@ namespace Neusta.Shared.Services.UnitOfWork
 		private readonly IUnitOfWork unitOfWork;
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="BaseService{TService}"/> class.
+		/// Initializes a new instance of the <see cref="BaseServiceWithUnitOfWork{TService}"/> class.
 		/// </summary>
 		protected BaseServiceWithUnitOfWork(IUnitOfWork unitOfWork)
 		{
@@ -33,6 +32,10 @@ namespace Neusta.Shared.Services.UnitOfWork
 			get { return this.unitOfWork; }
 		}
 
+		/// <summary>
+		/// Creates a child service.
+		/// </summary>
+		[PublicAPI]
 		public TChildService GetChildService<TChildService>(object[] dependencyOverrides = null)
 		{
 			IObjectProvider objectProvider = this.UnitOfWork.ObjectProvider;

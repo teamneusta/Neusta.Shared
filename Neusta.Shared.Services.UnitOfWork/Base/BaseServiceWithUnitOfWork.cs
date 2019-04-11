@@ -9,7 +9,7 @@ namespace Neusta.Shared.Services.UnitOfWork
 	using Neusta.Shared.Services.Base;
 
 	[UsedImplicitly]
-	public abstract class BaseServiceWithUnitOfWork<TService> : BaseService<TService>, IUnitOfWorkOwner
+	public abstract class BaseServiceWithUnitOfWork<TService> : BaseService<TService>, IUnitOfWorkOwner, IObjectProviderProvider
 		where TService : BaseServiceWithUnitOfWork<TService>
 	{
 		private readonly IUnitOfWork unitOfWork;
@@ -33,12 +33,22 @@ namespace Neusta.Shared.Services.UnitOfWork
 		}
 
 		/// <summary>
+		/// Gets the object provider.
+		/// </summary>
+		[PublicAPI]
+		public virtual IObjectProvider ObjectProvider
+		{
+			[DebuggerStepThrough]
+			get { return this.unitOfWork.ObjectProvider; }
+		}
+
+		/// <summary>
 		/// Creates a child service.
 		/// </summary>
 		[PublicAPI]
-		public TChildService GetChildService<TChildService>(object[] dependencyOverrides = null)
+		public virtual TChildService GetChildService<TChildService>(object[] dependencyOverrides = null)
 		{
-			IObjectProvider objectProvider = this.UnitOfWork.ObjectProvider;
+			IObjectProvider objectProvider = this.ObjectProvider;
 			if (typeof(IUnitOfWorkOwner).IsAssignableFrom(typeof(TChildService)))
 			{
 				IUnitOfWork unitOfWorkClone = this.UnitOfWork.Clone();

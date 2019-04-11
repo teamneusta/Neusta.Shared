@@ -1,6 +1,7 @@
 ﻿namespace Neusta.Shared.ObjectProvider.Stashbox.Adapter.Helper
 {
 	using System;
+	using System.Collections;
 	using System.Collections.Generic;
 	using System.Linq;
 	using System.Linq.Expressions;
@@ -14,15 +15,6 @@
 
 	internal static class RegistrationHelper
 	{
-		private static readonly TypeInfo[] typesToIgnore = new[]
-		{
-			typeof(IObjectProviderRoot).GetTypeInfo(),
-			typeof(IObjectProvider).GetTypeInfo(),
-			typeof(IObjectProviderScope).GetTypeInfo(),
-			typeof(IServiceLocator).GetTypeInfo(),
-			typeof(IServiceProvider).GetTypeInfo()
-		};
-
 		private static readonly Expression<Func<IDependencyResolver, object>> dependencyResolverResolveFunc = y => y.Resolve(typeof(object), true, null);
 		private static readonly MethodInfo dependencyResolverResolveMethodInfo = ((MethodCallExpression)dependencyResolverResolveFunc.Body).Method;
 
@@ -34,20 +26,29 @@
 		private static readonly ConstantExpression nullObjectArrayExpr = Expression.Constant(null, typeof(object[]));
 		private static readonly ConstantExpression nullServiceProviderExpr = Expression.Constant(null, typeof(IServiceProvider));
 
-		internal static void RegisterService(IDependencyRegistrator container, IServiceDescriptor descriptor, IObjectProvider objectProvider, bool replaceExisting)
+		private static readonly TypeInfo IEnumerableTypeInfo = typeof(IEnumerable).GetTypeInfo();
+
+		internal static bool RegisterService(IDependencyRegistrator container, IServiceDescriptor descriptor, IObjectProvider objectProvider, bool replaceExisting)
 		{
+			var serviceType = descriptor.ServiceType;
+
+			// Make sure that we do not register IEnumerable
+			if (IEnumerableTypeInfo.IsAssignableFrom(serviceType.GetTypeInfo()))
+			{
+				return false;
+			}
+
 			if (descriptor.IsSingletonBoundService())
 			{
 				// Special handling for singletons
 				var propertyInfo = SingletonHelper.GetSingletonInstancePropertyInfo(descriptor.ImplementationType);
-				container.Register(descriptor.ServiceType, delegate (IFluentServiceRegistrator context)
+				container.Register(serviceType, delegate (IFluentServiceRegistrator context)
 				{
 					ConfigureContextForSingleton(context, propertyInfo, objectProvider);
 				});
 			}
 			else
 			{
-				var serviceType = descriptor.ServiceType;
 				switch (descriptor.ImplementationSource)
 				{
 					case ImplementationSource.Type:
@@ -164,6 +165,7 @@
 						throw new ArgumentOutOfRangeException();
 				}
 			}
+			return true;
 		}
 
 		internal static void UnregisterService(IDependencyRegistrator container, IServiceDescriptor descriptor)

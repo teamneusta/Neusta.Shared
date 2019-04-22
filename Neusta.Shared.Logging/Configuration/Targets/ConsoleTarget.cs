@@ -2,7 +2,7 @@
 {
 	using System.Diagnostics;
 
-	public sealed class ConsoleTarget : ILoggingTarget
+	public sealed class ConsoleTarget : ILoggingTargetWithLayout
 	{
 		private readonly string name;
 		private string layout;
@@ -28,7 +28,7 @@
 
 		#endregion
 
-		#region Properties
+		#region Implementation of ILoggingTargetWithLayout
 
 		/// <summary>
 		/// Gets or sets the layout.

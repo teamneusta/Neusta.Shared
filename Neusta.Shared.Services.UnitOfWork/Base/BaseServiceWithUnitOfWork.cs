@@ -9,13 +9,13 @@ namespace Neusta.Shared.Services.UnitOfWork
 	using Neusta.Shared.Services.Base;
 
 	[UsedImplicitly]
-	public abstract class BaseServiceWithUnitOfWork<TService> : BaseService<TService>, IUnitOfWorkOwner
+	public abstract class BaseServiceWithUnitOfWork<TService> : BaseService<TService>, IUnitOfWorkOwner, IObjectProviderProvider
 		where TService : BaseServiceWithUnitOfWork<TService>
 	{
 		private readonly IUnitOfWork unitOfWork;
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="BaseService{TService}"/> class.
+		/// Initializes a new instance of the <see cref="BaseServiceWithUnitOfWork{TService}"/> class.
 		/// </summary>
 		protected BaseServiceWithUnitOfWork(IUnitOfWork unitOfWork)
 		{
@@ -32,27 +32,52 @@ namespace Neusta.Shared.Services.UnitOfWork
 			get { return this.unitOfWork; }
 		}
 
-		public TChildService GetChildService<TChildService>(object[] dependencyOverrides = null)
+		/// <summary>
+		/// Gets the object provider.
+		/// </summary>
+		[PublicAPI]
+		public virtual IObjectProvider ObjectProvider
 		{
-			IUnitOfWork unitOfWorkClone = this.UnitOfWork.Clone();
-			IObjectProvider objectProvider = this.UnitOfWork.ObjectProvider;
-			if (objectProvider != null)
+			[DebuggerStepThrough]
+			get { return this.unitOfWork.ObjectProvider; }
+		}
+
+		/// <summary>
+		/// Creates a child service.
+		/// </summary>
+		[PublicAPI]
+		public virtual TChildService GetChildService<TChildService>(object[] dependencyOverrides = null)
+		{
+			IObjectProvider objectProvider = this.ObjectProvider;
+			if (typeof(IUnitOfWorkOwner).IsAssignableFrom(typeof(TChildService)))
 			{
-				if ((dependencyOverrides != null) && dependencyOverrides.Any())
+				IUnitOfWork unitOfWorkClone = this.UnitOfWork.Clone();
+				if (objectProvider != null)
 				{
-					int length = dependencyOverrides.Length;
-					Array.Resize(ref dependencyOverrides, length + 1);
-					dependencyOverrides[length] = unitOfWorkClone;
+					if ((dependencyOverrides != null) && dependencyOverrides.Any())
+					{
+						int length = dependencyOverrides.Length;
+						Array.Resize(ref dependencyOverrides, length + 1);
+						dependencyOverrides[length] = unitOfWorkClone;
+					}
+					else
+					{
+						dependencyOverrides = new object[] { unitOfWorkClone };
+					}
+					return objectProvider.GetInstance<TChildService>(dependencyOverrides);
 				}
 				else
 				{
-					dependencyOverrides = new object[] { unitOfWorkClone };
+					return (TChildService)Activator.CreateInstance(typeof(TChildService), unitOfWorkClone);
 				}
+			}
+			else if (objectProvider != null)
+			{
 				return objectProvider.GetInstance<TChildService>(dependencyOverrides);
 			}
 			else
 			{
-				return (TChildService)Activator.CreateInstance(typeof(TChildService), unitOfWorkClone);
+				return (TChildService)Activator.CreateInstance(typeof(TChildService));
 			}
 		}
 	}

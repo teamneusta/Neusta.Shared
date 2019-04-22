@@ -73,23 +73,27 @@
 			var serviceGroups = configuration.ServiceDescriptors.GroupBy(x => x.ServiceType);
 			foreach (var serviceGroup in serviceGroups)
 			{
-				var serviceDescriptors = serviceGroup.ToArray();
-				if (!configuration.AutoResolveUnknownTypes || (serviceDescriptors.Length > 1))
+				IServiceDescriptor[] serviceDescriptors = serviceGroup.ToArray();
+				if (serviceDescriptors.Length > 1)
 				{
 					foreach (IServiceDescriptor serviceDescriptor in serviceDescriptors)
 					{
-						RegistrationHelper.RegisterService(container, serviceDescriptor, objectProvider, false);
-						cnt++;
+						if (RegistrationHelper.RegisterService(container, serviceDescriptor, objectProvider, false))
+						{
+							cnt++;
+						}
 					}
 					srv++;
 				}
 				else
 				{
-					var serviceDescriptor = serviceDescriptors[0];
+					IServiceDescriptor serviceDescriptor = serviceDescriptors.First();
 					if (!serviceDescriptor.IsSelfBoundService() || serviceDescriptor.IsSingletonBoundService())
 					{
-						RegistrationHelper.RegisterService(container, serviceDescriptor, objectProvider, false);
-						cnt++;
+						if (RegistrationHelper.RegisterService(container, serviceDescriptor, objectProvider, false))
+						{
+							cnt++;
+						}
 						srv++;
 					}
 				}

@@ -3,6 +3,7 @@ namespace Neusta.Shared.DataAccess.EntityFramework.TenantFilter
 	using System;
 	using System.Diagnostics;
 	using Neusta.Shared.DataAccess.UnitOfWork;
+	using Neusta.Shared.DataAccess.UnitOfWork.Base;
 
 	public class TenantFilterUnitOfWork : BaseUnitOfWork, ITenantFilterUnitOfWork
 	{
